@@ -58,6 +58,10 @@ func Login(endpoint, username, password string) (SessionInfo, error) {
 	}
 }
 
+func (s *SessionInfo) LoadInfos() {
+
+}
+
 // preparePassword hashes with MD5 the UTF16LE conversion of the parameters
 func preparePassword(challenge, password string) string {
 	converted := utf16.Encode([]rune(challenge + "-" + password))
