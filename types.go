@@ -20,6 +20,7 @@ import (
 type SessionInfo struct {
 	SID       string `xml:"SID"`
 	Challenge string `xml:"Challenge"`
+	EndPoint  string ``
 	BlockTime int    `xml:"BlockTime"`
 	// Rights interface{} Not implemented
 }
@@ -33,17 +34,28 @@ type RequestData struct {
 }
 
 type Data struct {
-	NasLink    string   `json:"naslink"`
-	FritzOS    FritzOS  `json:"fritzos"`
-	Webdav     string   `json:"webdav"`
-	Manual     string   `json:"MANUAL_URL"`
-	Language   string   `json:"language"`
-	AVM        string   `json:"AVM_URL"`
-	USBConnect string   `json:"usbconnect"`
-	Foncalls   Foncalls `json:"foncalls"`
-	VPN        VPN      `json:"vpn"`
-	Internet   Internet `json:"internet"`
-	DSL        DSL      `json:"dsl"`
+	NasLink          string    `json:"naslink"`
+	FritzOS          FritzOS   `json:"fritzos"`
+	Webdav           string    `json:"webdav"`
+	Manual           string    `json:"MANUAL_URL"`
+	Language         string    `json:"language"`
+	AVM              string    `json:"AVM_URL"`
+	USBConnect       string    `json:"usbconnect"`
+	Foncalls         Foncalls  `json:"foncalls"`
+	VPN              VPN       `json:"vpn"`
+	Internet         Internet  `json:"internet"`
+	DSL              DSL       `json:"dsl"`
+	ServicePortalURL string    `json:"SERVICEPORTAL_URL"`
+	Comfort          Comfort   `json:"comfort"`
+	Changelog        Changelog `json:"changelog"`
+	TamCalls         TamCalls  `json:"tamcalls"`
+	Lan              External  `json:"lan"`
+	USB              External  `json:"usb"`
+	FonNum           External  `json:"fonnum"`
+	NewsURL          string    `json:"NEWSLETTER_URL"`
+	Net              Net       `json:"net"`
+	Dect             External  `json:"dect"`
+	WLan             WLan      `json:"wlan"`
 }
 
 type Hide struct {
@@ -144,5 +156,69 @@ func (i *Internet) Sanitize() {
 }
 
 type DSL struct {
-	Txt string `json:""`
+	Txt         string `json:"txt"`
+	Led         string `json:"led"`
+	Title       string `json:"title"`
+	DiagStopPID string `json:"diag_stop_pid"`
+	DiagActive  string `json:"diag_active"`
+	AddDiag     string `json:"addDiag"`
+	Link        string `json:"link"`
+	Upload      string `json:"up"`
+	Download    string `json:"down"`
+}
+
+type Comfort struct {
+	Functions []ComfortFunc `json:"func"`
+	Any       bool          `json:"anyComfort"`
+}
+
+type ComfortFunc struct {
+	Name    string `json:"linktxt"`
+	Details string `json:"details"`
+	Link    string `json:"link"`
+}
+
+type Changelog struct {
+	DeviceName       string `json:"deviceName"`
+	FritzOSVersion   string `json:"fritzOsVersion"`
+	ConnectionStatus bool   `json:"connectionStatus"`
+	ProductName      string `json:"productName"`
+	IFrame           string `json:"iframeUrl"`
+}
+
+type TamCalls struct {
+	Calls      string `json:"calls"`
+	Configured bool   `json:"tam_configured"`
+	Count      int    `json:"count"`
+	CallsToday string `json:"callsToday"`
+}
+
+type External struct {
+	Txt   string `json:"txt"`
+	Led   string `json:"led"`
+	Title string `json:"title"`
+	Link  string `json:"link"`
+}
+
+type Net struct {
+	UnmeshedDevices bool     `json:"anyUnmeshedDevices"`
+	Count           int      `json:"count"`
+	ActiveCount     int      `json:"active_count"`
+	More            string   `json:"more_link"`
+	Devices         []Device `json:"devices"`
+}
+
+type Device struct {
+	Classes string `json:"classes"`
+	Type    string `json:"type"`
+	Name    string `json:"name"`
+	URL     string `json:"url"`
+}
+
+type WLan struct {
+	Txt     string `json:"txt"`
+	Led     string `json:"led"`
+	Title   string `json:"title"`
+	Link    string `json:"link"`
+	Tooltip string `json:"tooltip"`
 }
