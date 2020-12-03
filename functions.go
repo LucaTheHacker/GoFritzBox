@@ -14,6 +14,7 @@ import (
 	"crypto/md5"
 	"encoding/binary"
 	"encoding/hex"
+	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"io/ioutil"
@@ -36,7 +37,7 @@ func Login(endpoint, username, password string) (SessionInfo, error) {
 	if err != nil {
 		return SessionInfo{}, err
 	}
-	resp.Body.Close()
+	_ = resp.Body.Close()
 
 	resp, err = http.Get(endpoint + "/login_sid.lua?response=" + prelogin.Challenge + "-" + preparePassword(prelogin.Challenge, password) + "&username=" + username)
 	if err != nil {
@@ -49,17 +50,26 @@ func Login(endpoint, username, password string) (SessionInfo, error) {
 	if err != nil {
 		return SessionInfo{}, err
 	}
-	resp.Body.Close()
+	_ = resp.Body.Close()
 
 	if login.SID != "0000000000000000" {
+		login.EndPoint = endpoint
 		return login, nil
 	} else {
 		return login, errors.New("failed to login, try again in " + strconv.Itoa(login.BlockTime) + " second(s)")
 	}
 }
 
-func (s *SessionInfo) LoadInfos() {
+func (s *SessionInfo) LoadInfos() (Data, error) {
+	resp, err := http.Get(s.EndPoint + "/data.lua?xhr=1&lang=it&page=overview&xhrId=first&noMenuRef=1&no_sidrenew=&sid=" + s.SID)
+	if err != nil {
+		return Data{}, err
+	}
 
+	body, err := ioutil.ReadAll(resp.Body)
+	var result RequestData
+	err = json.Unmarshal(body, &result)
+	return result.Data, nil
 }
 
 // preparePassword hashes with MD5 the UTF16LE conversion of the parameters
