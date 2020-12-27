@@ -41,7 +41,8 @@ func Login(endpoint, username, password string) (SessionInfo, error) {
 	}
 	_ = resp.Body.Close()
 
-	resp, err = http.Get(endpoint + "/login_sid.lua?response=" + prelogin.Challenge + "-" + preparePassword(prelogin.Challenge, password) + "&username=" + username)
+	url := fmt.Sprintf("%s/login_sid.lua?response=%s-%s&username=%s", endpoint, prelogin.Challenge, preparePassword(prelogin.Challenge, password), username)
+	resp, err = http.Get(url)
 	if err != nil {
 		return SessionInfo{}, err
 	}
@@ -77,6 +78,7 @@ func (s *SessionInfo) LoadInfo() (Data, error) {
 	if err != nil {
 		return Data{}, err
 	}
+
 	var result RequestData
 	err = json.Unmarshal(body, &result)
 	if err != nil {
