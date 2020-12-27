@@ -16,3 +16,37 @@ I don't really know what some things are due to the very confusing APIs. I've tr
 
 If you need another feature you can open an issue and I will try to add it.
 Soon will be added ways to edit the Fritz!Box configuration, with an auto CRC32 signature.
+
+## Example
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/LucaTheHacker/GoFritzBox"
+)
+
+func main() {
+	session, err := GoFritzBox.Login("http://IP", "USERNAME", "PASSWORD")
+	if err != nil {
+		panic(err)
+	}
+
+	data, err := session.LoadInfo()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Fritz!OS version: ", data.FritzOS.Version)
+
+	stats, err := session.GetStats()
+	if err != nil {
+		panic(err)
+	}
+
+	stats.Load()
+	fmt.Println(stats.DownstreamTotal)
+	fmt.Println(stats.UpstreamTotal)
+}
+
+```
