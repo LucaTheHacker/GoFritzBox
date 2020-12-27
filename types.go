@@ -4,19 +4,26 @@
  *
  * types.go is part of GoFritzBox
  *
- * You should have received a copy of the GNU Affero General Public License v3.0
- * along with GoFritzBox. If not, see <https://github.com/LucaTheHacker/GoFritzBox/blob/main/LICENSE>.
+ * You should have received a copy of the GNU Affero General Public License v3.0 along with GoFritzBox.
+ * If not, see <https://github.com/LucaTheHacker/GoFritzBox/blob/main/LICENSE>.
  */
 
 package GoFritzBox
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
 
+// SessionInfo contains info about the current Session
+// SID is the session ID
+// Challenge is a part of the hash used for the Login
+// EndPoint is the endpoint used to do the HTTP requests
+// BlockTime is the cooldown needed after a wrong login, you need to handle it properly,
+// otherwise all the logins will fail, also with the correct authentication
 type SessionInfo struct {
 	SID       string `xml:"SID"`
 	Challenge string `xml:"Challenge"`
@@ -25,6 +32,7 @@ type SessionInfo struct {
 	// Rights interface{} Not implemented
 }
 
+// RequestData contains data about the usual Fritz!Box answer
 type RequestData struct {
 	PID  string `json:"pid"`
 	Data Data   `json:"data"`
@@ -64,6 +72,7 @@ type Hide struct {
 type Time struct {
 }
 
+// FritzOS contains info about the current Fritz!OS version
 type FritzOS struct {
 	Name           string `json:"Productname"`
 	NoPWD          bool   `json:"NoPwd"`
@@ -80,6 +89,7 @@ type FritzOS struct {
 	BoxDate        string `json:"boxDate"`
 }
 
+// Foncalls contains info about Calls
 type Foncalls struct {
 	ActiveCalls string `json:"activecalls"`
 	Calls       string `json:"calls"`
@@ -88,6 +98,7 @@ type Foncalls struct {
 	CountToday  int    `json:"count_today"`
 }
 
+// VPN contains info about the VPN
 type VPN struct {
 	Elements []interface{} `json:"elements"`
 	Title    string        `json:"title"`
@@ -109,6 +120,7 @@ type Internet struct {
 	ConnectionTime time.Time ``
 }
 
+// Sanitize sanitizes the Internet struct by cleaning bad values and generating data from other values
 func (i *Internet) Sanitize() {
 	if i.Led == "globe_online" {
 		i.Online = true
@@ -155,6 +167,7 @@ func (i *Internet) Sanitize() {
 	i.Download = int64(downloadSpeed / 10 * downloadMultiplier)
 }
 
+// DSL contains info about the connection status
 type DSL struct {
 	Txt         string `json:"txt"`
 	Led         string `json:"led"`
@@ -167,17 +180,20 @@ type DSL struct {
 	Download    string `json:"down"`
 }
 
+// Comfort contains info about Fritz!Box ComfortFunc
 type Comfort struct {
 	Functions []ComfortFunc `json:"func"`
 	Any       bool          `json:"anyComfort"`
 }
 
+// ComfortFunc contains info about a Comfort Function
 type ComfortFunc struct {
 	Name    string `json:"linktxt"`
 	Details string `json:"details"`
 	Link    string `json:"link"`
 }
 
+// Changelog contains info about the Fritz!Box
 type Changelog struct {
 	DeviceName       string `json:"deviceName"`
 	FritzOSVersion   string `json:"fritzOsVersion"`
@@ -200,6 +216,7 @@ type External struct {
 	Link  string `json:"link"`
 }
 
+// Net contains info about Device connected to the Fritz!Box
 type Net struct {
 	UnmeshedDevices bool     `json:"anyUnmeshedDevices"`
 	Count           int      `json:"count"`
@@ -208,6 +225,7 @@ type Net struct {
 	Devices         []Device `json:"devices"`
 }
 
+// Device contains info about a device in the LAN
 type Device struct {
 	Classes string `json:"classes"`
 	Type    string `json:"type"`
@@ -215,10 +233,44 @@ type Device struct {
 	URL     string `json:"url"`
 }
 
+// WLan contains info about the Wireless Lan
 type WLan struct {
 	Txt     string `json:"txt"`
 	Led     string `json:"led"`
 	Title   string `json:"title"`
 	Link    string `json:"link"`
 	Tooltip string `json:"tooltip"`
+}
+
+// Stats contains info about the current connection usage
+// These info are used to build the connection graph
+type Stats struct {
+	DownstreamMax       int     `json:"ds_bps_curr_max"`
+	UpstreamMax         int     `json:"us_bps_curr_max"`
+	DownstreamCapacity  int     `json:"downstream"`
+	UpstreamCapacity    int     `json:"upstream"`
+	StaticDownstreamMax int     `json:"ds_bps_max"`
+	StaticUpstreamMax   int     `json:"us_bps_max"`
+	Dynamic             bool    `json:"dynamic"`
+	Node                string  `json:"_node"`
+	Mode                string  `json:"mode"`
+	Name                string  `json:"name"`
+	DownstreamInternet  [19]int `json:"ds_bps_curr"`
+	DownstreamIPTV      [19]int `json:"ds_mc_bps_curr"`
+	DownstreamGuest     [19]int `json:"ds_guest_bps_curr"`
+	UpstreamRealTime    [19]int `json:"us_realtime_bps_curr"`
+	UpstreamPriority    [19]int `json:"us_important_bps_curr"`
+	UpstreamNormal      [19]int `json:"us_default19_bps_curr"`
+	UpstreamBackground  [19]int `json:"us_background_bps_curr"`
+	UpstreamGuest       [19]int `json:"guest_us_bps"`
+	DownstreamTotal     [19]int ``
+	UpstreamTotal       [19]int ``
+}
+
+// Load adds Total values to Stats, useful to get the Total internet usage
+func (s *Stats) Load() {
+	for i := 0; i <= 18; i++ {
+		s.DownstreamTotal[i] = s.DownstreamInternet[i] + s.DownstreamIPTV[i] + s.DownstreamGuest[i]
+		s.UpstreamTotal[i] = s.UpstreamRealTime[i] + s.UpstreamPriority[i] + s.UpstreamNormal[i] + s.UpstreamBackground[i] + s.UpstreamGuest[i]
+	}
 }
