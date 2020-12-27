@@ -108,6 +108,28 @@ func (s *SessionInfo) GetStats() (Stats, error) {
 	return result[0], nil
 }
 
+// Disconnect disconnects your Fritz!Box from the internet
+// This is usually used to change your IP address
+// The prodecure can require up to 30 seconds, after that the internet connection will be re-enabled
+func (s *SessionInfo) Disconnect() error {
+	url := fmt.Sprintf("%s/internet/inetstat_monitor.lua?sid=%s&myXhr=1&action=disconnect&useajax=1&xhr=1&t%d=nocache", s.EndPoint, s.SID, time.Now().Unix())
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if string(body) == "done:0" {
+		return nil
+	} else {
+		return errors.New("failed to disconnect")
+	}
+}
+
 // preparePassword hashes with MD5 the UTF16LE conversion of the parameters
 func preparePassword(challenge, password string) string {
 	converted := utf16.Encode([]rune(challenge + "-" + password))
