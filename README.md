@@ -6,11 +6,11 @@ GoFritzBox is a Golang utility to read or modify Fritz!Box parameters.
 Because AVMDE didn't release a documentation for its APIs, building this library is very hard and I won't waste my time building functions that nobody will use.
 
 ### Dude! There's no good documentation!
-Nice point, I really appreciate your attention.
+Nice point, I really appreciate your attention.  
 I don't really know what some things are due to the very confusing APIs. I've tried to do my best, you'll have some happy time trying to figure out what's going on.
 
 ### Some features are ignored!
-Yes, send an email to AVM asking for decent APIs, then I can do something about it.
+Yes, send an email to AVM asking for decent APIs, then I can do something about it.  
 In the same response object there are things with the same name and a different type, I can't work with them in Golang.
 
 ## Supported features:
