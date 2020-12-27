@@ -4,8 +4,8 @@
  *
  * functions.go is part of GoFritzBox
  *
- * You should have received a copy of the GNU Affero General Public License v3.0
- * along with GoFritzBox. If not, see <https://github.com/LucaTheHacker/GoFritzBox/blob/main/LICENSE>.
+ * You should have received a copy of the GNU Affero General Public License v3.0 along with GoFritzBox.
+ * If not, see <https://github.com/LucaTheHacker/GoFritzBox/blob/main/LICENSE>.
  */
 
 package GoFritzBox
@@ -17,13 +17,15 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 	"unicode/utf16"
 )
 
-// Login does a login on the Fritz!Box using infos of Connection
+// Login does a login on the Fritz!Box
 // Returns SessionInfo in case of success
 func Login(endpoint, username, password string) (SessionInfo, error) {
 	resp, err := http.Get(endpoint + "/login_sid.lua")
@@ -45,6 +47,9 @@ func Login(endpoint, username, password string) (SessionInfo, error) {
 	}
 
 	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return SessionInfo{}, err
+	}
 	var login SessionInfo
 	err = xml.Unmarshal(body, &login)
 	if err != nil {
@@ -60,16 +65,45 @@ func Login(endpoint, username, password string) (SessionInfo, error) {
 	}
 }
 
-func (s *SessionInfo) LoadInfos() (Data, error) {
-	resp, err := http.Get(s.EndPoint + "/data.lua?xhr=1&lang=it&page=overview&xhrId=first&noMenuRef=1&no_sidrenew=&sid=" + s.SID)
+// LoadInfo returns general Data about the Fritz!Box
+func (s *SessionInfo) LoadInfo() (Data, error) {
+	url := fmt.Sprintf("%s/data.lua?sid=%s&xhr=1&lang=it&page=overview&xhrId=first&noMenuRef=1&no_sidrenew=", s.EndPoint, s.SID)
+	resp, err := http.Get(url)
 	if err != nil {
 		return Data{}, err
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return Data{}, err
+	}
 	var result RequestData
 	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return Data{}, err
+	}
 	return result.Data, nil
+}
+
+// GetStats returns Stats to build the usage graph
+func (s *SessionInfo) GetStats() (Stats, error) {
+	url := fmt.Sprintf("%s/internet/inetstat_monitor.lua?sid=%s&myXhr=1&action=get_graphic&useajax=1&xhr=1&t%d=nocache", s.EndPoint, s.SID, time.Now().Unix())
+	resp, err := http.Get(url)
+	if err != nil {
+		return Stats{}, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return Stats{}, err
+	}
+
+	var result []Stats
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return Stats{}, err
+	}
+	return result[0], nil
 }
 
 // preparePassword hashes with MD5 the UTF16LE conversion of the parameters
