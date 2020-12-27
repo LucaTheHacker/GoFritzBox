@@ -9,6 +9,10 @@ Because AVMDE didn't release a documentation for its APIs, building this library
 Nice point, I really appreciate your attention.
 I don't really know what some things are due to the very confusing APIs. I've tried to do my best, you'll have some happy time trying to figure out what's going on.
 
+### Some features are ignored!
+Yes, send an email to AVM asking for decent APIs, then I can do something about it.
+In the same response object there are things with the same name and a different type, I can't work with them in Golang.
+
 ## Supported features:
 * Login
 * LoadInfo 
