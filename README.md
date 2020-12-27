@@ -14,7 +14,7 @@ I don't really know what some things are due to the very confusing APIs. I've tr
 * LoadInfo 
 * GetStats
 
-If you need another feature you can open an issue and I will try to add it.
+If you need another feature you can open an issue and I will try to add it.  
 Soon will be added ways to edit the Fritz!Box configuration, with an auto CRC32 signature.
 
 ## Example
