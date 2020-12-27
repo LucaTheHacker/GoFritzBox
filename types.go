@@ -11,6 +11,7 @@
 package GoFritzBox
 
 import (
+	"encoding/json"
 	"regexp"
 	"strconv"
 	"strings"
@@ -22,54 +23,54 @@ import (
 // Challenge is a part of the hash used for the Login
 // EndPoint is the endpoint used to do the HTTP requests
 // BlockTime is the cooldown needed after a wrong login, you need to handle it properly,
+// Lang is the lang that the Fritz!Box will use. Usually it's a useless parameters for API, but not on Fritz!OS
 // otherwise all the logins will fail, with the correct authentication as well
 type SessionInfo struct {
-	SID       string `xml:"SID"`
-	Challenge string `xml:"Challenge"`
-	EndPoint  string ``
-	BlockTime int    `xml:"BlockTime"`
-	// Rights interface{} Not implemented
+	SID       string      `xml:"SID"`
+	Challenge string      `xml:"Challenge"`
+	EndPoint  string      ``
+	BlockTime int         `xml:"BlockTime"`
+	Lang      string      ``
+	Rights    interface{} `` // Not Implemented
 }
 
 // RequestData contains data about the usual Fritz!Box answer
 type RequestData struct {
 	PID  string `json:"pid"`
 	Data Data   `json:"data"`
-	Hide []Hide `json:"hide"`
-	Time []Time `json:"time"`
-	SID  string `json:"sid"`
+	//Hide []Hide `json:"hide"` Removed for security reasons, check issue #1
+	//Time []Time `json:"time"` Removed for security reasons, check issue #1
+	SID string `json:"sid"`
 }
 
 // Data contains data about the Fritz!Box
 type Data struct {
-	NasLink          string    `json:"naslink"`
-	FritzOS          FritzOS   `json:"fritzos"`
-	Webdav           int       `json:"webdav,string"`
-	Manual           string    `json:"MANUAL_URL"`
-	Language         string    `json:"language"`
-	AVM              string    `json:"AVM_URL"`
-	USBConnect       string    `json:"usbconnect"`
-	Foncalls         Foncalls  `json:"foncalls"`
-	VPN              VPN       `json:"vpn"`
-	Internet         Internet  `json:"internet"`
-	DSL              DSL       `json:"dsl"`
-	ServicePortalURL string    `json:"SERVICEPORTAL_URL"`
-	Comfort          Comfort   `json:"comfort"`
-	Changelog        Changelog `json:"changelog"`
-	TamCalls         TamCalls  `json:"tamcalls"`
-	Lan              External  `json:"lan"`
-	USB              External  `json:"usb"`
-	FonNum           External  `json:"fonnum"`
-	NewsURL          string    `json:"NEWSLETTER_URL"`
-	Net              Net       `json:"net"`
-	Dect             External  `json:"dect"`
-	WLan             WLan      `json:"wlan"`
-}
-
-type Hide struct {
-}
-
-type Time struct {
+	NasLink          string           `json:"naslink"`
+	FritzOS          *FritzOS         `json:"fritzos"`
+	Webdav           int              `json:"webdav,string"`
+	Manual           string           `json:"MANUAL_URL"`
+	Language         string           `json:"language"`
+	AVM              string           `json:"AVM_URL"`
+	USBConnect       string           `json:"usbconnect"`
+	Foncalls         *Foncalls        `json:"foncalls"`
+	VPN              *VPN             `json:"vpn"`
+	Internet         *Internet        `json:"internet"`
+	DSL              *DSL             `json:"dsl"`
+	ServicePortalURL string           `json:"SERVICEPORTAL_URL"`
+	Comfort          *Comfort         `json:"comfort"`
+	Changelog        *Changelog       `json:"changelog"`
+	TamCalls         *TamCalls        `json:"tamcalls"`
+	Lan              *External        `json:"lan"`
+	Log              *Logs            `json:"log"`
+	Filter           int              `json:"filter,string"`
+	USB              *External        `json:"usb"`
+	FonNum           *External        `json:"fonnum"`
+	NewsURL          string           `json:"NEWSLETTER_URL"`
+	Net              *Net             `json:"net"`
+	Dect             *External        `json:"dect"`
+	WLanRaw          *json.RawMessage `json:"wlan"`
+	WLanBool         bool             ``
+	WLan             WLan             ``
 }
 
 // FritzOS contains infos about the current Fritz!OS version
@@ -219,11 +220,11 @@ type External struct {
 
 // Net contains infos about Device connected to the Fritz!Box
 type Net struct {
-	UnmeshedDevices bool     `json:"anyUnmeshedDevices"`
-	Count           int      `json:"count"`
-	ActiveCount     int      `json:"active_count"`
-	More            string   `json:"more_link"`
-	Devices         []Device `json:"devices"`
+	UnmeshedDevices bool      `json:"anyUnmeshedDevices"`
+	Count           int       `json:"count"`
+	ActiveCount     int       `json:"active_count"`
+	More            string    `json:"more_link"`
+	Devices         *[]Device `json:"devices"`
 }
 
 // Device contains infos about a device in the LAN
@@ -241,6 +242,34 @@ type WLan struct {
 	Title   string `json:"title"`
 	Link    string `json:"link"`
 	Tooltip string `json:"tooltip"`
+}
+
+type Logs [][]string
+
+// Filter filters Logs by type
+// 0 -> All,
+// 1 -> System,
+// 2 -> Internet,
+// 3 -> Phone,
+// 4 -> Wifi,
+// 5 -> USB
+func (l *Logs) Filter(filter int) Logs {
+	if filter == 0 {
+		return *l
+	}
+	if filter > 5 {
+		return Logs{}
+	}
+
+	// Bad code to do a type conversion, but the Fritz!Box returns the value as string
+	check := strconv.Itoa(filter)
+	var result Logs
+	for _, v := range *l {
+		if v[4] == check {
+			result = append(result, v)
+		}
+	}
+	return result
 }
 
 // Stats contains infos about the current connection usage
