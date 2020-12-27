@@ -11,7 +11,6 @@
 package GoFritzBox
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -36,15 +35,15 @@ type SessionInfo struct {
 type RequestData struct {
 	PID  string `json:"pid"`
 	Data Data   `json:"data"`
-	Hide Hide   `json:"hide"`
-	Time Time   `json:"time"`
+	Hide []Hide `json:"hide"`
+	Time []Time `json:"time"`
 	SID  string `json:"sid"`
 }
 
 type Data struct {
 	NasLink          string    `json:"naslink"`
 	FritzOS          FritzOS   `json:"fritzos"`
-	Webdav           string    `json:"webdav"`
+	Webdav           int       `json:"webdav,string"`
 	Manual           string    `json:"MANUAL_URL"`
 	Language         string    `json:"language"`
 	AVM              string    `json:"AVM_URL"`
@@ -74,26 +73,26 @@ type Time struct {
 
 // FritzOS contains info about the current Fritz!OS version
 type FritzOS struct {
-	Name           string `json:"Productname"`
-	NoPWD          bool   `json:"NoPwd"`
-	Defaults       bool   `json:"ShowDefaults"`
-	Expert         string `json:"expert_mode"`
-	FBName         string `json:"fb_name"`
-	Version        string `json:"nspver"`
-	Labor          bool   `json:"isLabor"`
-	TFADisabled    bool   `json:"twofactor_disabled"`
-	FirmwareSigned bool   `json:"FirmwareSigned"`
-	ShowUpdate     bool   `json:"showUpdate"`
-	Updatable      bool   `json:"isUpdateAvail"`
-	Energy         int    `json:"energy"`
-	BoxDate        string `json:"boxDate"`
+	Name           string  `json:"Productname"`
+	NoPWD          bool    `json:"NoPwd"`
+	Defaults       bool    `json:"ShowDefaults"`
+	Expert         int     `json:"expert_mode,string"`
+	FBName         string  `json:"fb_name"`
+	Version        float32 `json:"nspver,string"`
+	Labor          bool    `json:"isLabor"`
+	TFADisabled    bool    `json:"twofactor_disabled"`
+	FirmwareSigned bool    `json:"FirmwareSigned"`
+	ShowUpdate     bool    `json:"showUpdate"`
+	Updatable      bool    `json:"isUpdateAvail"`
+	Energy         int     `json:"energy,string"`
+	BoxDate        string  `json:"boxDate"`
 }
 
 // Foncalls contains info about Calls
 type Foncalls struct {
 	ActiveCalls string `json:"activecalls"`
 	Calls       string `json:"calls"`
-	CallsToday  string `json:"callsToday"`
+	CallsToday  int    `json:"callsToday,string"`
 	Count       int    `json:"count_all"`
 	CountToday  int    `json:"count_today"`
 }
@@ -173,7 +172,7 @@ type DSL struct {
 	Led         string `json:"led"`
 	Title       string `json:"title"`
 	DiagStopPID string `json:"diag_stop_pid"`
-	DiagActive  string `json:"diag_active"`
+	DiagActive  int    `json:"diag_active,string"`
 	AddDiag     string `json:"addDiag"`
 	Link        string `json:"link"`
 	Upload      string `json:"up"`
@@ -195,18 +194,18 @@ type ComfortFunc struct {
 
 // Changelog contains info about the Fritz!Box
 type Changelog struct {
-	DeviceName       string `json:"deviceName"`
-	FritzOSVersion   string `json:"fritzOsVersion"`
-	ConnectionStatus bool   `json:"connectionStatus"`
-	ProductName      string `json:"productName"`
-	IFrame           string `json:"iframeUrl"`
+	DeviceName       string  `json:"deviceName"`
+	FritzOSVersion   float32 `json:"fritzOsVersion,string"`
+	ConnectionStatus bool    `json:"connectionStatus"`
+	ProductName      string  `json:"productName"`
+	IFrame           string  `json:"iframeUrl"`
 }
 
 type TamCalls struct {
 	Calls      string `json:"calls"`
 	Configured bool   `json:"tam_configured"`
 	Count      int    `json:"count"`
-	CallsToday string `json:"callsToday"`
+	CallsToday int    `json:"callsToday,string"`
 }
 
 type External struct {
