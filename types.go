@@ -22,7 +22,7 @@ import (
 // Challenge is a part of the hash used for the Login
 // EndPoint is the endpoint used to do the HTTP requests
 // BlockTime is the cooldown needed after a wrong login, you need to handle it properly,
-// otherwise all the logins will fail, also with the correct authentication
+// otherwise all the logins will fail, with the correct authentication as well
 type SessionInfo struct {
 	SID       string `xml:"SID"`
 	Challenge string `xml:"Challenge"`
@@ -40,6 +40,7 @@ type RequestData struct {
 	SID  string `json:"sid"`
 }
 
+// Data contains data about the Fritz!Box
 type Data struct {
 	NasLink          string    `json:"naslink"`
 	FritzOS          FritzOS   `json:"fritzos"`
@@ -71,7 +72,7 @@ type Hide struct {
 type Time struct {
 }
 
-// FritzOS contains info about the current Fritz!OS version
+// FritzOS contains infos about the current Fritz!OS version
 type FritzOS struct {
 	Name           string  `json:"Productname"`
 	NoPWD          bool    `json:"NoPwd"`
@@ -97,13 +98,14 @@ type Foncalls struct {
 	CountToday  int    `json:"count_today"`
 }
 
-// VPN contains info about the VPN
+// VPN contains infos about the VPN
 type VPN struct {
 	Elements []interface{} `json:"elements"`
 	Title    string        `json:"title"`
 	Link     string        `json:"link"`
 }
 
+// Internet contains data about the internet connection
 type Internet struct {
 	Txt            []string  `json:"txt"`
 	Led            string    `json:"led"`
@@ -166,7 +168,7 @@ func (i *Internet) Sanitize() {
 	i.Download = int64(downloadSpeed / 10 * downloadMultiplier)
 }
 
-// DSL contains info about the connection status
+// DSL contains infos about the connection status
 type DSL struct {
 	Txt         string `json:"txt"`
 	Led         string `json:"led"`
@@ -179,20 +181,20 @@ type DSL struct {
 	Download    string `json:"down"`
 }
 
-// Comfort contains info about Fritz!Box ComfortFunc
+// Comfort contains infos about Fritz!Box ComfortFunc
 type Comfort struct {
 	Functions []ComfortFunc `json:"func"`
 	Any       bool          `json:"anyComfort"`
 }
 
-// ComfortFunc contains info about a Comfort Function
+// ComfortFunc contains infos about a Comfort Function
 type ComfortFunc struct {
 	Name    string `json:"linktxt"`
 	Details string `json:"details"`
 	Link    string `json:"link"`
 }
 
-// Changelog contains info about the Fritz!Box
+// Changelog contains infos about the Fritz!Box
 type Changelog struct {
 	DeviceName       string  `json:"deviceName"`
 	FritzOSVersion   float32 `json:"fritzOsVersion,string"`
@@ -215,7 +217,7 @@ type External struct {
 	Link  string `json:"link"`
 }
 
-// Net contains info about Device connected to the Fritz!Box
+// Net contains infos about Device connected to the Fritz!Box
 type Net struct {
 	UnmeshedDevices bool     `json:"anyUnmeshedDevices"`
 	Count           int      `json:"count"`
@@ -224,7 +226,7 @@ type Net struct {
 	Devices         []Device `json:"devices"`
 }
 
-// Device contains info about a device in the LAN
+// Device contains infos about a device in the LAN
 type Device struct {
 	Classes string `json:"classes"`
 	Type    string `json:"type"`
@@ -232,7 +234,7 @@ type Device struct {
 	URL     string `json:"url"`
 }
 
-// WLan contains info about the Wireless Lan
+// WLan contains infos about the Wireless Lan
 type WLan struct {
 	Txt     string `json:"txt"`
 	Led     string `json:"led"`
@@ -241,8 +243,8 @@ type WLan struct {
 	Tooltip string `json:"tooltip"`
 }
 
-// Stats contains info about the current connection usage
-// These info are used to build the connection graph
+// Stats contains infos about the current connection usage
+// These infos are used to build the connection graph
 type Stats struct {
 	DownstreamMax       int     `json:"ds_bps_curr_max"`
 	UpstreamMax         int     `json:"us_bps_curr_max"`
