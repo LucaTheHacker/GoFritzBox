@@ -17,6 +17,9 @@ In the same response object there are things with the same name and a different 
 * Login
 * LoadInfo 
 * GetStats
+* GetLogs
+* GetAssistanceData
+* Disconnect
 
 If you need any other feature you can open an issue and I will try to add it.  
 Soon, ways to edit the Fritz!Box configuration will be added with an auto CRC32 signature.
