@@ -145,8 +145,6 @@ func (i *Internet) Sanitize() {
 		uploadMultiplier = 1000000
 	case "Gbit/s":
 		uploadMultiplier = 1000000000
-	case "Tbit/s":
-		uploadMultiplier = 1000000000000
 	default:
 		uploadMultiplier = 1000000
 	}
@@ -160,8 +158,6 @@ func (i *Internet) Sanitize() {
 		downloadMultiplier = 1000000
 	case "Gbit/s":
 		downloadMultiplier = 1000000000
-	case "Tbit/s":
-		downloadMultiplier = 1000000000000
 	default:
 		downloadMultiplier = 1000000
 	}
