@@ -1,1 +1,1 @@
-module "GoFritzBox"
+module "github.com/LucaTheHacker/GoFritzBox"
