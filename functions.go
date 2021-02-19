@@ -87,10 +87,7 @@ func (s *SessionInfo) LoadInfo() (Data, error) {
 	if err != nil {
 		return Data{}, err
 	}
-	err = json.Unmarshal(*result.Data.WLanRaw, &result.Data.WLanBool)
-	if err != nil {
-		return Data{}, err
-	}
+
 	return result.Data, nil
 }
 
