@@ -1,6 +1,6 @@
 /*
  * GoFritzBox
- * Copyright (C) 2020-2020 Dametto Luca <https://damettoluca.com>
+ * Copyright (C) 2020-2021 Dametto Luca <https://damettoluca.com>
  *
  * types.go is part of GoFritzBox
  *
@@ -38,12 +38,13 @@ type SessionInfo struct {
 type RequestData struct {
 	PID  string `json:"pid"`
 	Data Data   `json:"data"`
-	//Hide []Hide `json:"hide"` Removed for security reasons, check issue #1
-	//Time []Time `json:"time"` Removed for security reasons, check issue #1
+	// Hide []Hide `json:"hide"` Removed for security reasons, check issue #1
+	// Time []Time `json:"time"` Removed for security reasons, check issue #1
 	SID string `json:"sid"`
 }
 
 // Data contains data about the Fritz!Box
+// WLan needs to be decoded manually, check the type before unmarhsal to WLan or WLanBool
 type Data struct {
 	NasLink          string           `json:"naslink"`
 	FritzOS          *FritzOS         `json:"fritzos"`
@@ -93,7 +94,7 @@ type FritzOS struct {
 // Foncalls contains info about Calls
 type Foncalls struct {
 	ActiveCalls string `json:"activecalls"`
-	Calls       string `json:"calls"`
+	Calls       string `json:"-"` // See issue #1
 	CallsToday  int    `json:"callsToday,string"`
 	Count       int    `json:"count_all"`
 	CountToday  int    `json:"count_today"`
@@ -145,6 +146,7 @@ func (i *Internet) Sanitize() {
 		uploadMultiplier = 1000000
 	case "Gbit/s":
 		uploadMultiplier = 1000000000
+
 	default:
 		uploadMultiplier = 1000000
 	}
