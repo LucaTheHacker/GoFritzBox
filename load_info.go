@@ -14,25 +14,31 @@ package GoFritzBox
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+
+	"github.com/valyala/fasthttp"
 )
 
 // LoadInfo returns general Data about the Fritz!Box
 func (s *SessionInfo) LoadInfo() (Data, error) {
-	url := fmt.Sprintf("%s/data.lua?sid=%s&xhr=1&lang=it&page=overview&xhrId=first&noMenuRef=1&no_sidrenew=", s.EndPoint, s.SID)
-	resp, err := http.Get(url)
-	if err != nil {
-		return Data{}, err
-	}
+	request := fasthttp.AcquireRequest()
+	response := fasthttp.AcquireResponse()
+	defer func() {
+		fasthttp.ReleaseRequest(request)
+		fasthttp.ReleaseResponse(response)
+	}()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	request.SetRequestURI(fmt.Sprintf(
+		"%s/data.lua?sid=%s&xhr=1&lang=it&page=overview&xhrId=first&noMenuRef=1&no_sidrenew=",
+		s.EndPoint, s.SID,
+	))
+
+	err := client.Do(request, response)
 	if err != nil {
 		return Data{}, err
 	}
 
 	var result RequestData
-	err = json.Unmarshal(body, &result)
+	err = json.Unmarshal(response.Body(), &result)
 	if err != nil {
 		return Data{}, err
 	}

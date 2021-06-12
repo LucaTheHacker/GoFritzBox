@@ -14,26 +14,32 @@ package GoFritzBox
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"time"
+
+	"github.com/valyala/fasthttp"
 )
 
 // GetStats returns Stats to build the usage graph
 func (s *SessionInfo) GetStats() (Stats, error) {
-	url := fmt.Sprintf("%s/internet/inetstat_monitor.lua?sid=%s&myXhr=1&action=get_graphic&useajax=1&xhr=1&t%d=nocache", s.EndPoint, s.SID, time.Now().Unix())
-	resp, err := http.Get(url)
-	if err != nil {
-		return Stats{}, err
-	}
+	request := fasthttp.AcquireRequest()
+	response := fasthttp.AcquireResponse()
+	defer func() {
+		fasthttp.ReleaseRequest(request)
+		fasthttp.ReleaseResponse(response)
+	}()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	request.SetRequestURI(fmt.Sprintf(
+		"%s/internet/inetstat_monitor.lua?sid=%s&myXhr=1&action=get_graphic&useajax=1&xhr=1&t%d=nocache",
+		s.EndPoint, s.SID, time.Now().Unix(),
+	))
+
+	err := client.Do(request, response)
 	if err != nil {
 		return Stats{}, err
 	}
 
 	var result []Stats
-	err = json.Unmarshal(body, &result)
+	err = json.Unmarshal(response.Body(), &result)
 	if err != nil {
 		return Stats{}, err
 	}

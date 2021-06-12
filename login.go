@@ -15,46 +15,50 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"strconv"
+
+	"github.com/valyala/fasthttp"
 )
 
 // Login does a login on the Fritz!Box
 // Returns SessionInfo in case of success
 func Login(endpoint, username, password string) (SessionInfo, error) {
-	resp, err := http.Get(endpoint + "/login_sid.lua")
+	request := fasthttp.AcquireRequest()
+	response := fasthttp.AcquireResponse()
+
+	request.SetRequestURI(endpoint + "/login_sid.lua")
+
+	err := client.Do(request, response)
 	if err != nil {
 		return SessionInfo{}, err
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
 	var prelogin SessionInfo
-	err = xml.Unmarshal(body, &prelogin)
+	err = xml.Unmarshal(response.Body(), &prelogin)
 	if err != nil {
 		return SessionInfo{}, err
 	}
-	_ = resp.Body.Close()
 
-	url := fmt.Sprintf(
+	fasthttp.ReleaseRequest(request)
+	fasthttp.ReleaseResponse(response)
+
+	request = fasthttp.AcquireRequest()
+	response = fasthttp.AcquireResponse()
+
+	request.SetRequestURI(fmt.Sprintf(
 		"%s/login_sid.lua?response=%s-%s&username=%s",
 		endpoint, prelogin.Challenge, preparePassword(prelogin.Challenge, password), username,
-	)
-	resp, err = http.Get(url)
+	))
+	err = client.Do(request, response)
 	if err != nil {
 		return SessionInfo{}, err
 	}
 
-	body, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return SessionInfo{}, err
-	}
 	var login SessionInfo
-	err = xml.Unmarshal(body, &login)
+	err = xml.Unmarshal(response.Body(), &login)
 	if err != nil {
 		return SessionInfo{}, err
 	}
-	_ = resp.Body.Close()
 
 	if login.SID != "0000000000000000" {
 		login.EndPoint = endpoint
