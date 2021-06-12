@@ -43,27 +43,6 @@ func (s *SessionInfo) LoadInfo() (Data, error) {
 	return result.Data, nil
 }
 
-// GetStats returns Stats to build the usage graph
-func (s *SessionInfo) GetStats() (Stats, error) {
-	url := fmt.Sprintf("%s/internet/inetstat_monitor.lua?sid=%s&myXhr=1&action=get_graphic&useajax=1&xhr=1&t%d=nocache", s.EndPoint, s.SID, time.Now().Unix())
-	resp, err := http.Get(url)
-	if err != nil {
-		return Stats{}, err
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return Stats{}, err
-	}
-
-	var result []Stats
-	err = json.Unmarshal(body, &result)
-	if err != nil {
-		return Stats{}, err
-	}
-	return result[0], nil
-}
-
 // GetLogs returns Logs of the Fritz!Box activity
 func (s *SessionInfo) GetLogs() (Logs, error) {
 	url := fmt.Sprintf("%s/data.lua", s.EndPoint)
