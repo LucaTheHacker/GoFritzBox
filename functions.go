@@ -17,7 +17,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -41,28 +40,6 @@ func (s *SessionInfo) LoadInfo() (Data, error) {
 	}
 
 	return result.Data, nil
-}
-
-// GetLogs returns Logs of the Fritz!Box activity
-func (s *SessionInfo) GetLogs() (Logs, error) {
-	url := fmt.Sprintf("%s/data.lua", s.EndPoint)
-	payload := fmt.Sprintf("sid=%s&page=log&lang=%s&xhr=1&xhrId=all", s.SID, s.Lang)
-	resp, err := http.Post(url, "application/x-www-form-urlencoded", strings.NewReader(payload))
-	if err != nil {
-		return Logs{}, err
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return Logs{}, err
-	}
-
-	var result RequestData
-	err = json.Unmarshal(body, &result)
-	if err != nil {
-		return Logs{}, err
-	}
-	return *result.Data.Log, nil
 }
 
 // Disconnect disconnects your Fritz!Box from the internet
