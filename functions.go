@@ -12,12 +12,10 @@
 package GoFritzBox
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"mime/multipart"
 	"net/http"
 	"strings"
 	"time"
@@ -86,37 +84,6 @@ func (s *SessionInfo) GetLogs() (Logs, error) {
 		return Logs{}, err
 	}
 	return *result.Data.Log, nil
-}
-
-// GetAssistanceData returns the firmwarecfg file useful to generate HLog/QLN graphs
-func (s *SessionInfo) GetAssistanceData() ([]byte, error) {
-	url := fmt.Sprintf("%s/cgi-bin/firmwarecfg", s.EndPoint)
-	payload := &bytes.Buffer{}
-	writer := multipart.NewWriter(payload)
-	_ = writer.WriteField("sid", s.SID)
-	_ = writer.WriteField("SupportData", "")
-	err := writer.Close()
-	if err != nil {
-		return []byte{}, err
-	}
-
-	req, err := http.NewRequest("POST", url, payload)
-	if err != nil {
-		return []byte{}, err
-	}
-
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	res, err := (&http.Client{}).Do(req)
-	if err != nil {
-		return []byte{}, err
-	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return []byte{}, err
-	}
-	return body, nil
 }
 
 // Disconnect disconnects your Fritz!Box from the internet
