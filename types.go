@@ -1,6 +1,7 @@
 /*
  * GoFritzBox
- * Copyright (C) 2020-2021 Dametto Luca <https://damettoluca.com>
+ *
+ * Copyright (C) 2016-2021 Dametto Luca <https://damettoluca.com>
  *
  * types.go is part of GoFritzBox
  *
@@ -72,6 +73,7 @@ type Data struct {
 	WLanRaw          *json.RawMessage `json:"wlan"`
 	WLanBool         bool             ``
 	WLan             WLan             ``
+	ConnectionData   ConnectionData   `json:"connectionData"`
 }
 
 // FritzOS contains infos about the current Fritz!OS version
@@ -301,4 +303,27 @@ func (s *Stats) Load() {
 		s.DownstreamTotal[i] = s.DownstreamInternet[i] + s.DownstreamIPTV[i] + s.DownstreamGuest[i]
 		s.UpstreamTotal[i] = s.UpstreamRealTime[i] + s.UpstreamPriority[i] + s.UpstreamNormal[i] + s.UpstreamBackground[i] + s.UpstreamGuest[i]
 	}
+}
+
+type ConnectionData struct {
+	ExternApValue  string `json:"externApValue"`
+	Modell         string `json:"modell"`
+	IsDebug        bool   `json:"isDebug"`
+	LineLength     int64  `json:"lineLength"`
+	ExternAPHeader string `json:"externAPHeader"`
+	ExternApText   string `json:"externApText"`
+	Line           []Line `json:"line"`
+	Version        string `json:"version"`
+	Versiontext    string `json:"versiontext"`
+	DsRate         string `json:"dsRate"`
+	UsRate         string `json:"usRate"`
+}
+
+type Line struct {
+	State            string `json:"state"`
+	TimePrefix       string `json:"timePrefix"`
+	TrainState       string `json:"trainState"`
+	Mode             string `json:"mode"`
+	TrainStatePrefix string `json:"trainStatePrefix"`
+	Time             string `json:"time"`
 }
