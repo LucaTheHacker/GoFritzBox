@@ -14,14 +14,13 @@ package GoFritzBox
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"mime/multipart"
-	"net/http"
+
+	"github.com/valyala/fasthttp"
 )
 
 // GetAssistanceData returns the firmwarecfg file useful to generate HLog/QLN graphs
 func (s *SessionInfo) GetAssistanceData() ([]byte, error) {
-	url := fmt.Sprintf("%s/cgi-bin/firmwarecfg", s.EndPoint)
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
 	_ = writer.WriteField("sid", s.SID)
@@ -31,21 +30,23 @@ func (s *SessionInfo) GetAssistanceData() ([]byte, error) {
 		return []byte{}, err
 	}
 
-	req, err := http.NewRequest("POST", url, payload)
+	request := fasthttp.AcquireRequest()
+	response := fasthttp.AcquireResponse()
+	defer func() {
+		fasthttp.ReleaseRequest(request)
+		fasthttp.ReleaseResponse(response)
+	}()
+
+	request.SetRequestURI(fmt.Sprintf("%s/cgi-bin/firmwarecfg", s.EndPoint))
+	request.Header.SetContentType(writer.FormDataContentType())
+	request.Header.SetMethod(fasthttp.MethodPost)
+
+	request.SetBodyRaw(payload.Bytes())
+
+	err = client.Do(request, response)
 	if err != nil {
 		return []byte{}, err
 	}
 
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	res, err := (&http.Client{}).Do(req)
-	if err != nil {
-		return []byte{}, err
-	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return []byte{}, err
-	}
-	return body, nil
+	return response.Body(), nil
 }
