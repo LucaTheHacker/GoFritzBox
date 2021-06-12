@@ -29,6 +29,8 @@ func (s *SessionInfo) GetLogs() (Logs, error) {
 
 	request.SetRequestURI(fmt.Sprintf("%s/data.lua", s.EndPoint))
 	request.SetBodyString(fmt.Sprintf("sid=%s&page=log&lang=%s&xhr=1&xhrId=all", s.SID, s.Lang))
+	request.Header.SetContentType("application/x-www-form-urlencoded")
+	request.Header.SetMethod(fasthttp.MethodPost)
 
 	err := client.Do(request, response)
 	if err != nil {
