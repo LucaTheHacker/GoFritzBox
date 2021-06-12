@@ -14,27 +14,29 @@ package GoFritzBox
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"strings"
+
+	"github.com/valyala/fasthttp"
 )
 
 // GetLogs returns Logs of the Fritz!Box activity
 func (s *SessionInfo) GetLogs() (Logs, error) {
-	url := fmt.Sprintf("%s/data.lua", s.EndPoint)
-	payload := fmt.Sprintf("sid=%s&page=log&lang=%s&xhr=1&xhrId=all", s.SID, s.Lang)
-	resp, err := http.Post(url, "application/x-www-form-urlencoded", strings.NewReader(payload))
-	if err != nil {
-		return Logs{}, err
-	}
+	request := fasthttp.AcquireRequest()
+	response := fasthttp.AcquireResponse()
+	defer func() {
+		fasthttp.ReleaseRequest(request)
+		fasthttp.ReleaseResponse(response)
+	}()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	request.SetRequestURI(fmt.Sprintf("%s/data.lua", s.EndPoint))
+	request.SetBodyString(fmt.Sprintf("sid=%s&page=log&lang=%s&xhr=1&xhrId=all", s.SID, s.Lang))
+
+	err := client.Do(request, response)
 	if err != nil {
 		return Logs{}, err
 	}
 
 	var result RequestData
-	err = json.Unmarshal(body, &result)
+	err = json.Unmarshal(response.Body(), &result)
 	if err != nil {
 		return Logs{}, err
 	}
