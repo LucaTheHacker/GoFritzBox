@@ -73,7 +73,7 @@ type Data struct {
 	WLanRaw          *json.RawMessage `json:"wlan"`
 	WLanBool         bool             ``
 	WLan             WLan             ``
-	ConnectionData   ConnectionData   `json:"connectionData"`
+	ConnectionData   *ConnectionData  `json:"connectionData"`
 }
 
 // FritzOS contains infos about the current Fritz!OS version
