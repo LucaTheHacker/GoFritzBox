@@ -1,6 +1,7 @@
 /*
  * GoFritzBox
- * Copyright (C) 2020-2021 Dametto Luca <https://damettoluca.com>
+ *
+ * Copyright (C) 2016-2021 Dametto Luca <https://damettoluca.com>
  *
  * types.go is part of GoFritzBox
  *
